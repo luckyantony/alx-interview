@@ -1,30 +1,51 @@
 #!/usr/bin/python3
-import sys
+"""program that solves the N queens problem."""
+from sys import argv, exit
 
-def queens(n, i, a, b, c):
-    '''
-    Calculates every possible solution to the n queen puzzle
-    '''
-    if i < n:
-        for j in range(n):
-            if j not in a and i+j not in b and i-j not in c:
-                yield from queens(n, i+1, a+[j], b+[i+j], c+[i-j])
+
+if len(argv) != 2:
+    print("Usage: nqueens N")
+    exit(1)
+
+N = argv[1]
+
+try:
+    N = int(N)
+except ValueError:
+    print("N must be a number")
+    exit(1)
+
+if N < 4:
+    print("N must be at least 4")
+    exit(1)
+
+solution = []
+
+
+def nqueens(row, N, solution):
+    """The program should print any possible solution"""
+    if (row == N):
+        print(solution)
     else:
-        yield a
+        for col in range(N):
+            position = [row, col]
+            if validposition(solution, position):
+                solution.append(position)
+                nqueens(row + 1, N, solution)
+                solution.remove(position)
 
 
-if sys.argv.__len__ != 2:
-    print('Usage: nqueens N')
-    sys.exit(1)
+def validposition(solution, position):
+    """validate horizontal and diagonal position of queens"""
+    for queen in solution:
+        if queen[1] == position[1]:
+            return False
+        # descending diagonal
+        if (queen[0] - queen[1]) == (position[0] - position[1]):
+            return False
+        # ascending diagonal
+        if (queen[0] + queen[1]) == (position[0] + position[1]):
+            return False
+    return True
 
-n = sys.argv[1]
-if not isinstance(n, int):
-    print('N must be a number')
-    sys.exit(1)
-
-if n < 4:
-    print('N must be at least 4')
-    sys.exit(1)
-
-for solution in queens(n, 0, [], [], []):
-    print(solution)
+nqueens(0, N, solution)
